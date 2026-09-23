@@ -1,0 +1,7 @@
+# Preserve generated artifact hashes on Windows clones using core.autocrlf.
+*.py text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+out/*.csv text eol=lf
+out/*.json text eol=lf
+*.parquet binary
