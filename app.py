@@ -42,6 +42,15 @@ with st.sidebar:
     st.divider()
     st.caption(f"Расчёт: {manifest['total_seconds']:.2f} с · без API")
     st.caption(f"Дата прогона UTC: {manifest['created_at_utc'][:19]}")
+    st.subheader("Готовые результаты")
+    st.caption("Все три CSV уже сохранены в папке результатов. Скачивание создаёт дополнительную копию.")
+    with st.expander("Где лежат готовые CSV", expanded=True):
+        st.code(str(out.resolve()), language=None, wrap_lines=True)
+        st.caption("Папка на компьютере, где запущено приложение. Откройте её в Проводнике.")
+        st.markdown("- `nodes_roles.csv` — роли всех участников\n- `top_nodes.csv` — приоритеты проверки\n- `clusters.csv` — сводка кластеров")
+    with st.expander("Chrome заблокировал скачивание?"):
+        st.write("Если Chrome пишет «Ваша организация заблокировала файл», скачивание ограничено политикой безопасности. Приложение не может снять это ограничение; причину блокировки должен проверить администратор браузера или компьютера.")
+        st.write("Результаты расчёта уже сохранены в указанной выше папке. Блокировка скачивания не означает, что расчёт завершился с ошибкой.")
     st.download_button("Скачать роли CSV", (out / "nodes_roles.csv").read_bytes(), "nodes_roles.csv", "text/csv")
     st.download_button("Скачать топ CSV", (out / "top_nodes.csv").read_bytes(), "top_nodes.csv", "text/csv")
     st.download_button("Скачать кластеры CSV", (out / "clusters.csv").read_bytes(), "clusters.csv", "text/csv")
