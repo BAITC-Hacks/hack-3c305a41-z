@@ -1,5 +1,5 @@
 {
-  "created_at_utc": "2026-09-23T10:54:15.603734+00:00",
+  "created_at_utc": "2026-09-23T12:06:17.888502+00:00",
   "config": {
     "random_seed": 42,
     "data": {
@@ -96,6 +96,24 @@
       },
       "top_count": 20
     },
+    "temporal": {
+      "fast_pass_days": 2,
+      "fast_pass_min_share": 0.5,
+      "sync_min_payers": 3
+    },
+    "resilience": {
+      "steps": [
+        0,
+        5,
+        10,
+        20,
+        30,
+        50,
+        80
+      ],
+      "random_trials": 5,
+      "headline_step": 20
+    },
     "export": {
       "evidence_max_chars": 200,
       "max_runtime_seconds": 300
@@ -123,7 +141,7 @@
       "assistant_max_steps": 6
     }
   },
-  "config_sha256": "f2913ad3dba1e6bb54771d962a1ed0d7548c4b67d2b025bf742cc668a74c154b",
+  "config_sha256": "3d807ce595bee998edda3d83dd873805b8c2f0ac50f14709ddc8610659266cb5",
   "input_sha256": {
     "edges.parquet": "4e71dde5cd3115bcb26e91202665532ee6581cf8233a9fc8059ea59fb7358a38",
     "nodes.parquet": "d2a45b0df6e9352832d5fb09839d10b9e23f898156c3bab263b051b31cc0296d",
@@ -176,24 +194,45 @@
   },
   "cluster_count": 88,
   "clusters_with_multiple_seeds": 8,
+  "temporal": {
+    "nodes_with_timing": 570,
+    "fast_pass_nodes": 275,
+    "fast_pass_transit_nodes": 30,
+    "synchronised_inflow_nodes": 38,
+    "median_hold_days": 2.0
+  },
+  "resilience": {
+    "headline_step": 20,
+    "baseline_largest_component": 1877,
+    "priority_largest_component": 1351,
+    "random_largest_component": 1841.0,
+    "priority_fragments": 101.0,
+    "random_fragments": 18.6,
+    "priority_turnover_share": 0.6311,
+    "random_turnover_share": 0.9143,
+    "advantage_nodes_detached": 490
+  },
   "timings_seconds": {
-    "Проверка входа": 0.07336350000696257,
-    "Граф": 0.012050899997120723,
-    "Метрики": 2.0624468000023626,
-    "Роли": 0.07545219999155961,
-    "Кластеры": 0.10112199999275617,
-    "Приоритет": 0.04402890001074411,
-    "Экспорт": 0.17736289999447763
+    "Проверка входа": 0.11062789999414235,
+    "Граф": 0.02421259999391623,
+    "Метрики": 2.5118109000031836,
+    "Время": 0.4521930000046268,
+    "Роли": 0.07796340002096258,
+    "Кластеры": 0.10693109998828731,
+    "Приоритет": 0.05626069998834282,
+    "Устойчивость": 0.677444100001594,
+    "Экспорт": 0.2201133999915328
   },
   "llm_used": false,
   "llm": null,
   "artifacts": {
     "clusters.csv": "ab800f603d4848a79e7e17174dfc863a7a03e9bf4ba284f203a795ef933dd285",
-    "node_features.parquet": "c57fdab7b40c6e852eff2dd031565efc154bbc02b64c3c0cd4f0f42a21eb08fd",
-    "nodes_roles.csv": "7a0ead1f5d1135616a61f568301f9970d927fae5c0be2f24e4f0e6b5e8d6799c",
+    "node_features.parquet": "88095abeb6939e06248b7da649b35e0fa085d6771079ff6d3b463f8a4fa880b0",
+    "nodes_roles.csv": "e3b51df14e687699b5d824204d75876d4c5a4e683595d2ea01c3760187b6fc8b",
+    "resilience.csv": "139bd3d8134d8380bbf0aeb0236e27d327863f2890ffe97c050d110560d1cbf3",
     "top_nodes.csv": "865a621ae7daeed938da1366c14255313654e633701ac73ecd53d7d72d0ade9a",
     "viewer_edges.parquet": "e4142bb5dda8a3a4f99f30057f61c3cf1bf7abfe4e50bb5481be571bd15f8f0a"
   },
-  "total_seconds": 2.770750100025907,
+  "total_seconds": 4.49839290001546,
   "within_time_limit": true
 }

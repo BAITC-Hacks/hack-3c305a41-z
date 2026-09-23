@@ -18,7 +18,7 @@ def read_bundle(folder: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame,
     if not manifest_path.exists():
         raise ValueError("Результаты не найдены. Сначала выполните python run.py --data data --out out")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    required = {"nodes_roles.csv", "clusters.csv", "top_nodes.csv", "node_features.parquet", "viewer_edges.parquet"}
+    required = {"nodes_roles.csv", "clusters.csv", "top_nodes.csv", "resilience.csv", "node_features.parquet", "viewer_edges.parquet"}
     if set(manifest.get("artifacts", {})) != required:
         raise ValueError("Неполный набор результатов. Повторите расчёт.")
     for name, expected in manifest["artifacts"].items():
@@ -26,7 +26,8 @@ def read_bundle(folder: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame,
         if not path.is_file() or file_hash(path) != expected:
             raise ValueError(f"Результаты изменены или смешаны: {name}. Повторите расчёт.")
     return (pd.read_parquet(folder / "node_features.parquet"), pd.read_parquet(folder / "viewer_edges.parquet"),
-            pd.read_csv(folder / "clusters.csv"), pd.read_csv(folder / "top_nodes.csv"), manifest)
+            pd.read_csv(folder / "clusters.csv"), pd.read_csv(folder / "top_nodes.csv"),
+            pd.read_csv(folder / "resilience.csv"), manifest)
 
 
 def select_neighborhood(nodes: pd.DataFrame, edges: pd.DataFrame, gid: int, max_nodes: int) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

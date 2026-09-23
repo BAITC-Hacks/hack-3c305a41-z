@@ -16,7 +16,9 @@ from src.graph import build_graph
 from src.load import load_data
 from src.narrate import add_evidence
 from src.priority import rank_nodes
+from src.resilience import fragmentation
 from src.roles import assign_roles
+from src.temporal import compute_temporal, summarize
 
 
 def run(data: Path, out: Path, config_path: Path, llm: bool = False) -> dict:
@@ -36,10 +38,12 @@ def run(data: Path, out: Path, config_path: Path, llm: bool = False) -> dict:
     nodes, edges, tx, data_report = timed("Проверка входа", lambda: load_data(data, config))
     graph = timed("Граф", lambda: build_graph(nodes, edges))
     features, diagnostics = timed("Метрики", lambda: compute_features(graph, nodes, config))
+    features = timed("Время", lambda: features.merge(compute_temporal(tx, nodes, config), on="gid", how="left"))
     roles = timed("Роли", lambda: add_evidence(add_gaps(assign_roles(features, config)), config))
     roles = timed("Кластеры", lambda: assign_clusters(roles, graph, config))
     roles, top = timed("Приоритет", lambda: rank_nodes(roles, config))
     clusters = summarize_clusters(roles, edges, config)
+    resilience, resilience_summary = timed("Устойчивость", lambda: fragmentation(graph, roles, edges, config))
     narrative = None
     if llm:
         # Optional layer: a failure here must never cost us the deterministic artifacts.
@@ -55,9 +59,10 @@ def run(data: Path, out: Path, config_path: Path, llm: bool = False) -> dict:
                 "python": sys.version.split()[0], "packages": {name: version(name) for name in ("pandas", "numpy", "networkx", "pyarrow", "scipy", "PyYAML")},
                 "data_report": data_report, "diagnostics": diagnostics, "role_counts": roles.role.value_counts().sort_index().to_dict(),
                 "cluster_count": len(clusters), "clusters_with_multiple_seeds": int((clusters.n_seed > 1).sum()),
+                "temporal": summarize(roles), "resilience": resilience_summary,
                 "timings_seconds": timings, "llm_used": narrative is not None,
                 "llm": narrative}
-    timed("Экспорт", lambda: write_outputs(roles, clusters, top, edges, out, manifest))
+    timed("Экспорт", lambda: write_outputs(roles, clusters, top, edges, resilience, out, manifest))
     if narrative is not None:
         (out / "llm_review.json").write_text(json.dumps(narrative, ensure_ascii=False, indent=2), encoding="utf-8")
     elapsed = perf_counter() - start

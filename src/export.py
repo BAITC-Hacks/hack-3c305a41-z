@@ -41,7 +41,7 @@ def validate_outputs(nodes: pd.DataFrame, clusters: pd.DataFrame, top: pd.DataFr
         raise ValueError("Вклады не складываются в приоритет")
 
 
-def write_outputs(nodes: pd.DataFrame, clusters: pd.DataFrame, top: pd.DataFrame, edges: pd.DataFrame, out: Path, manifest: dict[str, Any]) -> None:
+def write_outputs(nodes: pd.DataFrame, clusters: pd.DataFrame, top: pd.DataFrame, edges: pd.DataFrame, resilience: pd.DataFrame, out: Path, manifest: dict[str, Any]) -> None:
     out.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix=".export-", dir=out.parent) as temporary:
         staging = Path(temporary)
@@ -49,6 +49,7 @@ def write_outputs(nodes: pd.DataFrame, clusters: pd.DataFrame, top: pd.DataFrame
         ordered[NODE_COLUMNS + [c for c in ordered if c not in NODE_COLUMNS]].to_csv(staging / "nodes_roles.csv", index=False, encoding="utf-8", lineterminator="\n", float_format="%.12g")
         clusters[CLUSTER_COLUMNS].to_csv(staging / "clusters.csv", index=False, encoding="utf-8", lineterminator="\n", float_format="%.12g")
         top[TOP_COLUMNS].to_csv(staging / "top_nodes.csv", index=False, encoding="utf-8", lineterminator="\n", float_format="%.12g")
+        resilience.to_csv(staging / "resilience.csv", index=False, encoding="utf-8", lineterminator="\n", float_format="%.12g")
         ordered.to_parquet(staging / "node_features.parquet", index=False)
         edges.to_parquet(staging / "viewer_edges.parquet", index=False)
         manifest["artifacts"] = {p.name: file_hash(p) for p in sorted(staging.iterdir())}

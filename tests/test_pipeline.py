@@ -142,9 +142,13 @@ def test_end_to_end_reproducibility_and_tamper(tmp_path):
     run(data, second, ROOT / "config.yaml", llm=True)
     for name in ["nodes_roles.csv", "clusters.csv", "top_nodes.csv"]:
         assert (first / name).read_bytes() == (second / name).read_bytes()
-    nodes, edges, clusters, top, manifest = read_bundle(first)
+    nodes, edges, clusters, top, resilience, manifest = read_bundle(first)
     assert len(nodes) == clusters.n_nodes.sum() == 5
     assert len(top) == 5 and not manifest["llm_used"]
+    # Removing nodes by priority must never look better for the network than chance.
+    assert set(resilience.strategy) == {"priority", "random"}
+    assert (resilience.groupby("strategy").largest_component.min()["priority"]
+            <= resilience.groupby("strategy").largest_component.min()["random"])
     assert nodes.priority_score.between(0, 1).all()
     with (first / "nodes_roles.csv").open("a") as handle:
         handle.write("tampered")
@@ -158,7 +162,7 @@ def test_all_isolates_export(tmp_path):
     edges.iloc[:0].to_parquet(data / "edges.parquet", index=False)
     tx.iloc[:0].to_parquet(data / "transactions.parquet", index=False)
     run(data, tmp_path / "out", ROOT / "config.yaml")
-    result, _, clusters, _, _ = read_bundle(tmp_path / "out")
+    result, _, clusters, _, _, _ = read_bundle(tmp_path / "out")
     assert len(clusters) == len(nodes)
     assert result.role.eq("peripheral").all() and result.role_score.eq(0).all()
 
@@ -167,7 +171,7 @@ def test_graph_is_offline_and_preserves_ids(tmp_path, config):
     data = tmp_path / "data"
     small_input(data)
     run(data, tmp_path / "out", ROOT / "config.yaml")
-    nodes, edges, _, _, _ = read_bundle(tmp_path / "out")
+    nodes, edges, _, _, _, _ = read_bundle(tmp_path / "out")
     selected, links, incident = select_neighborhood(nodes, edges, 2, 2)
     assert 2 in selected.gid.values and len(selected) == 2
     assert len(incident) == 2

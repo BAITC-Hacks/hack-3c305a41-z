@@ -11,7 +11,7 @@ def load_config(path: Path) -> dict[str, Any]:
         config = yaml.safe_load(handle)
     if not isinstance(config, dict):
         raise ValueError("Конфигурация должна быть словарём YAML")
-    for section in ("data", "features", "roles", "clusters", "priority", "export", "viewer"):
+    for section in ("data", "features", "roles", "clusters", "priority", "export", "viewer", "temporal", "resilience"):
         if section not in config:
             raise ValueError(f"Отсутствует раздел конфигурации: {section}")
     role_names = {"coordinator", "consolidator", "distributor", "transit", "terminal"}
@@ -30,6 +30,13 @@ def load_config(path: Path) -> dict[str, Any]:
     transit = config["roles"]["transit"]
     if not 0 <= transit["min_ratio"] < 1 < transit["max_ratio"]:
         raise ValueError("Границы transit должны охватывать единицу")
+    steps = config["resilience"]["steps"]
+    if sorted(set(steps)) != list(steps) or steps[0] != 0:
+        raise ValueError("resilience.steps должен возрастать и начинаться с нуля")
+    if config["resilience"]["headline_step"] not in steps:
+        raise ValueError("resilience.headline_step должен быть одним из steps")
+    if not 0 < config["temporal"]["fast_pass_min_share"] <= 1:
+        raise ValueError("temporal.fast_pass_min_share должен находиться в (0, 1]")
     for section, key in (("priority", "top_count"), ("viewer", "max_nodes"), ("clusters", "top_gids_count")):
         if not isinstance(config[section][key], int) or config[section][key] <= 0:
             raise ValueError(f"{section}.{key} должен быть положительным целым")
