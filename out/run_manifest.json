@@ -1,0 +1,182 @@
+{
+  "created_at_utc": "2026-09-23T10:03:57.909483+00:00",
+  "config": {
+    "random_seed": 42,
+    "data": {
+      "max_depth": 4,
+      "min_transaction_kzt": 5000,
+      "period_start": "2026-07-01",
+      "period_end": "2026-07-31",
+      "amount_tolerance": 0.01,
+      "expected": {
+        "nodes": 2248,
+        "edges": 3119,
+        "transactions": 4840,
+        "seeds": 81
+      }
+    },
+    "features": {
+      "pagerank_alpha": 0.85,
+      "pagerank_tolerance": 1e-06,
+      "pagerank_max_iterations": 1000,
+      "betweenness_sample": null,
+      "normalization_quantile": 0.95
+    },
+    "roles": {
+      "minimum_score": 0.5,
+      "fallback_cap": 0.49,
+      "tie_order": [
+        "coordinator",
+        "consolidator",
+        "distributor",
+        "transit",
+        "terminal"
+      ],
+      "consolidator": {
+        "min_in_degree": 3,
+        "max_pass_through": 0.6,
+        "max_concentration": 0.75,
+        "weights": {
+          "breadth": 0.4,
+          "diversity": 0.3,
+          "retention": 0.3
+        }
+      },
+      "distributor": {
+        "min_out_degree": 10,
+        "weights": {
+          "breadth": 0.7,
+          "volume": 0.3
+        }
+      },
+      "transit": {
+        "min_ratio": 0.8,
+        "max_ratio": 1.2,
+        "weights": {
+          "balance": 0.7,
+          "volume": 0.3
+        }
+      },
+      "terminal": {
+        "min_in_kzt": 50000,
+        "weights": {
+          "no_outgoing": 0.6,
+          "volume": 0.4
+        }
+      },
+      "coordinator": {
+        "min_depth": 2,
+        "min_seed_sources": 2,
+        "min_normalized_betweenness": 0.7,
+        "weights": {
+          "brokerage": 0.7,
+          "sources": 0.3
+        }
+      }
+    },
+    "clusters": {
+      "resolution": 1.0,
+      "threshold": 1e-07,
+      "top_gids_count": 3
+    },
+    "priority": {
+      "weights": {
+        "role": 0.4,
+        "sources": 0.2,
+        "volume": 0.2,
+        "brokerage": 0.2
+      },
+      "role_values": {
+        "coordinator": 1.0,
+        "consolidator": 0.9,
+        "distributor": 0.7,
+        "transit": 0.5,
+        "terminal": 0.4,
+        "peripheral": 0.1
+      },
+      "top_count": 20
+    },
+    "export": {
+      "evidence_max_chars": 200,
+      "max_runtime_seconds": 300
+    },
+    "viewer": {
+      "max_nodes": 80,
+      "height": 560,
+      "layout_seed": 42,
+      "stabilization_iterations": 150
+    }
+  },
+  "config_sha256": "bbdb8288c17e3505f8db9e90e214230adb591ec3ad5ad9af2904a1ab3e024356",
+  "input_sha256": {
+    "edges.parquet": "4e71dde5cd3115bcb26e91202665532ee6581cf8233a9fc8059ea59fb7358a38",
+    "nodes.parquet": "d2a45b0df6e9352832d5fb09839d10b9e23f898156c3bab263b051b31cc0296d",
+    "transactions.parquet": "c30c5317b5439591dde86f2058dc47a3d19b2900c055ded994fe547f6fb7e7da"
+  },
+  "python": "3.13.2",
+  "packages": {
+    "pandas": "3.0.6",
+    "numpy": "2.5.3",
+    "networkx": "3.7",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "PyYAML": "6.0.3"
+  },
+  "data_report": {
+    "nodes": 2248,
+    "edges": 3119,
+    "transactions": 4840,
+    "seeds": 81,
+    "sum_kzt": 365890012.01,
+    "warnings": [],
+    "period_start": "2026-07-01 00:00:00",
+    "period_end": "2026-07-31 00:00:00",
+    "aggregates_match": true
+  },
+  "diagnostics": {
+    "normalization_scales": {
+      "in_deg": 3.0,
+      "out_deg": 16.350000000000023,
+      "in_kzt": 620722.5,
+      "out_kzt": 2332914.1000000006,
+      "n_seed_sources": 10.0,
+      "betweenness": 0.0013361804007553844
+    },
+    "betweenness_sample": null,
+    "weak_components_with_isolates": 35,
+    "weak_components_without_isolates": 16,
+    "isolated_nodes": 19,
+    "largest_component": 1877,
+    "outside_largest_component": 371,
+    "truncated_nodes": 444
+  },
+  "role_counts": {
+    "consolidator": 85,
+    "coordinator": 12,
+    "distributor": 56,
+    "peripheral": 1581,
+    "terminal": 472,
+    "transit": 42
+  },
+  "cluster_count": 88,
+  "clusters_with_multiple_seeds": 8,
+  "timings_seconds": {
+    "Проверка входа": 0.11563090002164245,
+    "Граф": 0.02262400000472553,
+    "Метрики": 2.223624000005657,
+    "Роли": 0.07587020000210032,
+    "Кластеры": 0.11792610000702552,
+    "Приоритет": 0.054817100026411936,
+    "Экспорт": 0.1668978999950923
+  },
+  "llm_used": false,
+  "artifacts": {
+    "clusters.csv": "ab800f603d4848a79e7e17174dfc863a7a03e9bf4ba284f203a795ef933dd285",
+    "node_features.parquet": "c57fdab7b40c6e852eff2dd031565efc154bbc02b64c3c0cd4f0f42a21eb08fd",
+    "nodes_roles.csv": "7a0ead1f5d1135616a61f568301f9970d927fae5c0be2f24e4f0e6b5e8d6799c",
+    "top_nodes.csv": "865a621ae7daeed938da1366c14255313654e633701ac73ecd53d7d72d0ade9a",
+    "viewer_edges.parquet": "e4142bb5dda8a3a4f99f30057f61c3cf1bf7abfe4e50bb5481be571bd15f8f0a"
+  },
+  "total_seconds": 3.0310620999953244,
+  "within_time_limit": true
+}

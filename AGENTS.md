@@ -15,7 +15,7 @@
 
 ## Стек
 
-Python 3.11+ · pandas · pyarrow · networkx · numpy · Streamlit · pyvis
+Python 3.12+ (проверено на 3.13) · pandas · pyarrow · networkx · numpy · Streamlit · pyvis
 OpenAI API — только в опциональном слое `src/ai/`.
 
 ## Карта репозитория

@@ -1,0 +1,9 @@
+# Tested on Python 3.13; pin direct dependencies for repeatable calculations.
+pandas==3.0.6
+pyarrow==25.0.1
+networkx==3.7
+numpy==2.5.3
+scipy==1.18.1
+PyYAML==6.0.3
+streamlit==1.64.0
+pyvis==0.3.2

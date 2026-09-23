@@ -1,0 +1,56 @@
+# Настройки эвристик, не обученная модель и не вероятность виновности.
+random_seed: 42 # Фиксированный порядок случайных операций для повторяемости.
+data:
+  max_depth: 4 # Граница обхода организаторов.
+  min_transaction_kzt: 5000 # Порог включения переводов из README датасета.
+  period_start: '2026-07-01'
+  period_end: '2026-07-31'
+  amount_tolerance: 0.01 # Допуск сверки агрегатов: одна сотая KZT.
+  expected: {nodes: 2248, edges: 3119, transactions: 4840, seeds: 81}
+features:
+  pagerank_alpha: 0.85 # Стандартное затухание PageRank; не критерий роли.
+  pagerank_tolerance: 0.000001 # Критерий численной сходимости.
+  pagerank_max_iterations: 1000 # Ограничение вычислений, ошибка сходимости явная.
+  betweenness_sample: null # На данном объёме считаем точно; число включает сэмплирование.
+  normalization_quantile: 0.95 # Уменьшает влияние единичных экстремальных значений; по положительным.
+roles:
+  minimum_score: 0.50 # Требуем хотя бы половину максимальной поддержки правила.
+  fallback_cap: 0.49 # Peripheral не получает высокую уверенность из отсутствия признаков.
+  tie_order: [coordinator, consolidator, distributor, transit, terminal]
+  consolidator:
+    min_in_degree: 3 # Минимальный сбор от нескольких независимых контрагентов.
+    max_pass_through: 0.6 # В выборке далее ушло не больше 60% входящих.
+    max_concentration: 0.75 # Один плательщик не должен объяснять почти весь сбор.
+    weights: {breadth: 0.4, diversity: 0.3, retention: 0.3}
+  distributor:
+    min_out_degree: 10 # Веер заметно шире обычной цепочки; стартовая эвристика.
+    weights: {breadth: 0.7, volume: 0.3}
+  transit:
+    min_ratio: 0.8 # Допуск ±20%: неполная месячная выборка не даёт точного баланса.
+    max_ratio: 1.2
+    weights: {balance: 0.7, volume: 0.3}
+  terminal:
+    # Применяется только если не выполнены условия consolidator: сбор с многих — более специфичный признак.
+    min_in_kzt: 50000 # Не меньше десяти минимальных переводов; исследовать чувствительность.
+    weights: {no_outgoing: 0.6, volume: 0.4}
+  coordinator:
+    min_depth: 2 # Ищем структуру за пределами непосредственного первого колена.
+    min_seed_sources: 2 # Требуем достижимость минимум от двух seed.
+    min_normalized_betweenness: 0.7 # Верхняя часть шкалы посредничества после p95-нормировки.
+    weights: {brokerage: 0.7, sources: 0.3}
+clusters:
+  resolution: 1.0 # Базовый масштаб Louvain, без подгонки к количеству сообществ.
+  threshold: 0.0000001 # Минимальный прирост модульности алгоритма.
+  top_gids_count: 3 # Краткая сводка ключевых узлов каждого кластера.
+priority:
+  weights: {role: 0.4, sources: 0.2, volume: 0.2, brokerage: 0.2}
+  role_values: {coordinator: 1.0, consolidator: 0.9, distributor: 0.7, transit: 0.5, terminal: 0.4, peripheral: 0.1}
+  top_count: 20 # Обязательный минимум ТЗ; маленький тестовый граф отдаёт все узлы.
+export:
+  evidence_max_chars: 200 # Ограничение ТЗ.
+  max_runtime_seconds: 300 # Ограничение ТЗ на полный прогон.
+viewer:
+  max_nodes: 80 # Ограничиваем перегруженность графа; полный список соседей остаётся в таблице.
+  height: 560 # Высота интерактивной схемы в пикселях.
+  layout_seed: 42 # Повторяемый начальный layout.
+  stabilization_iterations: 150 # Ограничение времени раскладки в браузере.
