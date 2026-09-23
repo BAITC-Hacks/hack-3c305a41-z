@@ -24,8 +24,6 @@ def run(data: Path, out: Path, config_path: Path, llm: bool = False) -> dict:
     config = load_config(config_path)
     if out.resolve() == data.resolve():
         raise ValueError("Папки данных и результатов должны различаться")
-    if llm:
-        print("ИИ-слой ещё не реализован; выполняется полный офлайн-расчёт без обращений к API.")
     timings = {}
 
     def timed(label, operation):
@@ -42,14 +40,26 @@ def run(data: Path, out: Path, config_path: Path, llm: bool = False) -> dict:
     roles = timed("Кластеры", lambda: assign_clusters(roles, graph, config))
     roles, top = timed("Приоритет", lambda: rank_nodes(roles, config))
     clusters = summarize_clusters(roles, edges, config)
+    narrative = None
+    if llm:
+        # Optional layer: a failure here must never cost us the deterministic artifacts.
+        from src.ai.client import LLMUnavailable
+        from src.ai.orchestrator import enrich
+        try:
+            roles, clusters, top, narrative = timed("ИИ-слой", lambda: enrich(roles, clusters, top, config))
+        except LLMUnavailable as error:
+            print(f"ИИ-слой пропущен, тексты остаются офлайн-расчётом: {error}")
     validate_outputs(roles, clusters, top, nodes, config)
     manifest = {"created_at_utc": datetime.now(timezone.utc).isoformat(), "config": config,
                 "config_sha256": file_hash(config_path), "input_sha256": {p.name: file_hash(p) for p in sorted(data.glob("*.parquet"))},
                 "python": sys.version.split()[0], "packages": {name: version(name) for name in ("pandas", "numpy", "networkx", "pyarrow", "scipy", "PyYAML")},
                 "data_report": data_report, "diagnostics": diagnostics, "role_counts": roles.role.value_counts().sort_index().to_dict(),
                 "cluster_count": len(clusters), "clusters_with_multiple_seeds": int((clusters.n_seed > 1).sum()),
-                "timings_seconds": timings, "llm_used": False}
+                "timings_seconds": timings, "llm_used": narrative is not None,
+                "llm": narrative}
     timed("Экспорт", lambda: write_outputs(roles, clusters, top, edges, out, manifest))
+    if narrative is not None:
+        (out / "llm_review.json").write_text(json.dumps(narrative, ensure_ascii=False, indent=2), encoding="utf-8")
     elapsed = perf_counter() - start
     manifest["total_seconds"] = elapsed
     manifest["within_time_limit"] = elapsed <= config["export"]["max_runtime_seconds"]
@@ -69,7 +79,7 @@ def main() -> int:
     parser.add_argument("--data", type=Path, default=Path("data"))
     parser.add_argument("--out", type=Path, default=Path("out"))
     parser.add_argument("--config", type=Path, default=Path(__file__).with_name("config.yaml"))
-    parser.add_argument("--llm", action="store_true", help="Зарезервировано; пока используется офлайн-расчёт")
+    parser.add_argument("--llm", action="store_true", help="Слой агентов: переписывает тексты поверх готовых чисел")
     args = parser.parse_args()
     try:
         run(args.data, args.out, args.config, args.llm)

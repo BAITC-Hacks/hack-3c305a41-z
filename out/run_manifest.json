@@ -1,5 +1,5 @@
 {
-  "created_at_utc": "2026-09-23T10:03:57.909483+00:00",
+  "created_at_utc": "2026-09-23T10:54:15.603734+00:00",
   "config": {
     "random_seed": 42,
     "data": {
@@ -105,9 +105,25 @@
       "height": 560,
       "layout_seed": 42,
       "stabilization_iterations": 150
+    },
+    "llm": {
+      "api_key_env": "OPENAI_API_KEY",
+      "models": {
+        "writer": "gpt-4.1-mini",
+        "critic": "gpt-4.1-mini",
+        "assistant": "gpt-4.1-mini"
+      },
+      "temperature": 0.2,
+      "max_output_tokens": 400,
+      "timeout_seconds": 30,
+      "retries": 1,
+      "max_parallel": 8,
+      "top_nodes": 20,
+      "min_cluster_size": 5,
+      "assistant_max_steps": 6
     }
   },
-  "config_sha256": "bbdb8288c17e3505f8db9e90e214230adb591ec3ad5ad9af2904a1ab3e024356",
+  "config_sha256": "f2913ad3dba1e6bb54771d962a1ed0d7548c4b67d2b025bf742cc668a74c154b",
   "input_sha256": {
     "edges.parquet": "4e71dde5cd3115bcb26e91202665532ee6581cf8233a9fc8059ea59fb7358a38",
     "nodes.parquet": "d2a45b0df6e9352832d5fb09839d10b9e23f898156c3bab263b051b31cc0296d",
@@ -161,15 +177,16 @@
   "cluster_count": 88,
   "clusters_with_multiple_seeds": 8,
   "timings_seconds": {
-    "Проверка входа": 0.11563090002164245,
-    "Граф": 0.02262400000472553,
-    "Метрики": 2.223624000005657,
-    "Роли": 0.07587020000210032,
-    "Кластеры": 0.11792610000702552,
-    "Приоритет": 0.054817100026411936,
-    "Экспорт": 0.1668978999950923
+    "Проверка входа": 0.07336350000696257,
+    "Граф": 0.012050899997120723,
+    "Метрики": 2.0624468000023626,
+    "Роли": 0.07545219999155961,
+    "Кластеры": 0.10112199999275617,
+    "Приоритет": 0.04402890001074411,
+    "Экспорт": 0.17736289999447763
   },
   "llm_used": false,
+  "llm": null,
   "artifacts": {
     "clusters.csv": "ab800f603d4848a79e7e17174dfc863a7a03e9bf4ba284f203a795ef933dd285",
     "node_features.parquet": "c57fdab7b40c6e852eff2dd031565efc154bbc02b64c3c0cd4f0f42a21eb08fd",
@@ -177,6 +194,6 @@
     "top_nodes.csv": "865a621ae7daeed938da1366c14255313654e633701ac73ecd53d7d72d0ade9a",
     "viewer_edges.parquet": "e4142bb5dda8a3a4f99f30057f61c3cf1bf7abfe4e50bb5481be571bd15f8f0a"
   },
-  "total_seconds": 3.0310620999953244,
+  "total_seconds": 2.770750100025907,
   "within_time_limit": true
 }

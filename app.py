@@ -1,4 +1,4 @@
-"""Local analyst viewer; never recomputes or calls a model."""
+"""Local analyst viewer. Never recomputes; calls a model only in the optional assistant tab."""
 import os
 from pathlib import Path
 
@@ -78,7 +78,7 @@ if cluster_filter != "Все":
 if role_filter != "Все":
     filtered = filtered[filtered.role == role_filter]
 
-network_tab, ranking_tab, clusters_tab = st.tabs(["Сеть и карточка", "Приоритеты", "Кластеры и качество"])
+network_tab, ranking_tab, clusters_tab, assistant_tab = st.tabs(["Сеть и карточка", "Приоритеты", "Кластеры и качество", "Ассистент"])
 with network_tab:
     left, right = st.columns([2, 1])
     with left:
@@ -157,3 +157,27 @@ with clusters_tab:
     for warning in report["warnings"]:
         st.warning(warning)
     st.dataframe(nodes.role.value_counts().rename_axis("Роль").reset_index(name="Узлов"), hide_index=True)
+
+with assistant_tab:
+    st.subheader("Вопрос по сети на обычном языке")
+    st.caption("Ассистент не видит граф напрямую: он вызывает функции по выгрузке и называет gid, на которых основан ответ. Роли и числа не пересчитываются.")
+    # An older run may predate the llm section; the viewer must still open it.
+    key_name = config.get("llm", {}).get("api_key_env", "OPENAI_API_KEY")
+    if not os.environ.get(key_name):
+        st.info(f"Вкладка включается переменной {key_name}. Без неё остальной инструмент работает полностью — расчёт и выгрузки не зависят от внешних сервисов.")
+    else:
+        question = st.text_input("Вопрос", placeholder="Кто собирает деньги с этих пятерых: 100000008686313100, ...", key="assistant_question")
+        if st.button("Спросить", key="assistant_ask") and question.strip():
+            from src.ai.client import LLMUnavailable
+            from src.ai.tools import GraphTools, answer
+            try:
+                with st.spinner("Ассистент обращается к выгрузке"):
+                    result = answer(question, GraphTools(nodes, edges), config)
+            except LLMUnavailable as error:
+                st.error(f"Ассистент недоступен: {error}")
+            else:
+                st.write(result["answer"])
+                if result["gids"]:
+                    st.caption("Узлы в ответе: " + ", ".join(str(g) for g in result["gids"]))
+                with st.expander("Какие функции были вызваны"):
+                    st.json(result["trace"])
