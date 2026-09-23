@@ -6,7 +6,7 @@ import networkx as nx
 import pandas as pd
 
 from src.ai import agents as roster
-from src.ai.client import LLMUnavailable, build_client
+from src.ai.client import LLMUnavailable, build_client, create_chat
 
 SCHEMA = [
     {"type": "function", "function": {"name": "node_card", "description": "Карточка узла: роль, метрики, обоснование, ограничения данных.",
@@ -87,8 +87,7 @@ def answer(question: str, tools: GraphTools, config: dict[str, Any]) -> dict[str
     messages = [{"role": "system", "content": roster.ASSISTANT.system}, {"role": "user", "content": question}]
     trace: list[dict[str, Any]] = []
     for _ in range(settings["assistant_max_steps"]):
-        response = client.chat.completions.create(model=settings["models"]["assistant"], temperature=settings["temperature"],
-                                                  messages=messages, tools=SCHEMA)
+        response = create_chat(client, settings, settings["models"]["assistant"], messages, tools=SCHEMA)
         message = response.choices[0].message
         if not message.tool_calls:
             content = json.loads(message.content) if message.content and message.content.strip().startswith("{") else {"answer": message.content}

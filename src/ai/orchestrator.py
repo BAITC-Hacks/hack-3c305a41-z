@@ -43,13 +43,18 @@ def _review(client, settings, agent: roster.Agent, draft: str, source: str) -> d
 def _write_one(client, settings, agent: roster.Agent, key: Any, source: str, fallback: str) -> dict[str, Any]:
     record = {"agent": agent.name, "key": key, "offline": fallback, "used": "offline"}
     try:
-        draft = str(ask_json(client, settings, settings["models"]["writer"], agent.system, source)[agent.output_key]).strip()
+        # Ask for less than the contract allows: an overshoot then still fits,
+        # instead of costing the whole text a fallback to the template.
+        budget = int(agent.max_chars * settings["length_budget"])
+        request = (f"Целевая длина: не более {budget} символов. Жёсткий предел: {agent.max_chars}. "
+                   f"Входные данные: {source}")
+        draft = str(ask_json(client, settings, settings["models"]["writer"], agent.system, request)[agent.output_key]).strip()
     except (LLMUnavailable, KeyError, TypeError) as error:
         record["error"] = str(error)
         record["final"] = fallback
         return record
     record["draft"] = draft
-    review = _review(client, settings, agent, draft, source)
+    review = _review(client, settings, agent, draft, request)
     record["critic"] = review["verdict"]
     record["issues"] = review["issues"]
     text = review["text"]

@@ -1,5 +1,5 @@
 {
-  "created_at_utc": "2026-09-23T12:06:17.888502+00:00",
+  "created_at_utc": "2026-09-23T12:40:10.651833+00:00",
   "config": {
     "random_seed": 42,
     "data": {
@@ -127,21 +127,22 @@
     "llm": {
       "api_key_env": "OPENAI_API_KEY",
       "models": {
-        "writer": "gpt-4.1-mini",
-        "critic": "gpt-4.1-mini",
-        "assistant": "gpt-4.1-mini"
+        "writer": "gpt-5.4-mini",
+        "critic": "gpt-5.4-mini",
+        "assistant": "gpt-5.4-mini"
       },
       "temperature": 0.2,
       "max_output_tokens": 400,
       "timeout_seconds": 30,
       "retries": 1,
       "max_parallel": 8,
+      "length_budget": 0.8,
       "top_nodes": 20,
       "min_cluster_size": 5,
       "assistant_max_steps": 6
     }
   },
-  "config_sha256": "3d807ce595bee998edda3d83dd873805b8c2f0ac50f14709ddc8610659266cb5",
+  "config_sha256": "1df02e5bb1839ca7362cba948b9b48ce88bb5c4c68c3e8d2a378650256aff226",
   "input_sha256": {
     "edges.parquet": "4e71dde5cd3115bcb26e91202665532ee6581cf8233a9fc8059ea59fb7358a38",
     "nodes.parquet": "d2a45b0df6e9352832d5fb09839d10b9e23f898156c3bab263b051b31cc0296d",
@@ -213,15 +214,15 @@
     "advantage_nodes_detached": 490
   },
   "timings_seconds": {
-    "Проверка входа": 0.11062789999414235,
-    "Граф": 0.02421259999391623,
-    "Метрики": 2.5118109000031836,
-    "Время": 0.4521930000046268,
-    "Роли": 0.07796340002096258,
-    "Кластеры": 0.10693109998828731,
-    "Приоритет": 0.05626069998834282,
-    "Устойчивость": 0.677444100001594,
-    "Экспорт": 0.2201133999915328
+    "Проверка входа": 0.07162859998061322,
+    "Граф": 0.01207359999534674,
+    "Метрики": 1.9880065000033937,
+    "Время": 0.44443679999676533,
+    "Роли": 0.07541809999383986,
+    "Кластеры": 0.11427279998315498,
+    "Приоритет": 0.050686300004599616,
+    "Устойчивость": 0.6279710999806412,
+    "Экспорт": 0.17294489999767393
   },
   "llm_used": false,
   "llm": null,
@@ -233,6 +234,6 @@
     "top_nodes.csv": "865a621ae7daeed938da1366c14255313654e633701ac73ecd53d7d72d0ade9a",
     "viewer_edges.parquet": "e4142bb5dda8a3a4f99f30057f61c3cf1bf7abfe4e50bb5481be571bd15f8f0a"
   },
-  "total_seconds": 4.49839290001546,
+  "total_seconds": 3.8041296000010334,
   "within_time_limit": true
 }
